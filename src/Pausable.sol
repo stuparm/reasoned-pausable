@@ -19,6 +19,7 @@ import {Context} from "./Context.sol";
  */
 abstract contract Pausable is Context {
     bool private _paused;
+    string private _reason;
 
     /**
      * @dev Emitted when the pause is triggered by `account`.
@@ -33,7 +34,7 @@ abstract contract Pausable is Context {
     /**
      * @dev The operation failed because the contract is paused.
      */
-    error EnforcedPause();
+    error EnforcedPause(string);
 
     /**
      * @dev The operation failed because the contract is not paused.
@@ -83,7 +84,7 @@ abstract contract Pausable is Context {
      */
     function _requireNotPaused() internal view virtual {
         if (paused()) {
-            revert EnforcedPause();
+            revert EnforcedPause(_reason);
         }
     }
 
@@ -103,8 +104,9 @@ abstract contract Pausable is Context {
      *
      * - The contract must not be paused.
      */
-    function _pause() internal virtual whenNotPaused {
+    function _pause(string memory reason) internal virtual whenNotPaused {
         _paused = true;
+        _reason = reason;
         emit Paused(_msgSender());
     }
 
