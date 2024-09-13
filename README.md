@@ -14,9 +14,10 @@ When this function is called, the contract is paused, and the Paused(address) ev
 ```sql
 select count() as c from ethereum.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 20523
 select count() as c from optimism.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 1724
-select count(*) as c from arbitrum.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 48418
-select count(*) as c from avalanche_c.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 4177
-select count(*) as c from polygon.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 34208
+select count() as c from arbitrum.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 48418
+select count() as c from avalanche_c.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 4177
+select count() as c from polygon.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 34208
+select count() as c from base.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 2212
 ```
 
 However, when a contract is paused, users receive no additional information regarding the reason for the pause or any possible actions they can take. They only encounter a generic Paused error.
