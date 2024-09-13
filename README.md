@@ -1,66 +1,39 @@
-## Foundry
+## Pausable with reason string
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Currently, when someone needs to pause a contract (i.e., stop its functioning for any reason), the OpenZeppelin _pause() function can be invoked.
 
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```javascript
+function _pause() internal virtual whenNotPaused {
+     _paused = true;
+    emit Paused(_msgSender());
+}
 ```
 
-### Test
+When this function is called, the contract is paused, and the Paused(address) event is emitted. Below are the statistics showing how many times this event has been triggered, based on data from Dune Analytics (as of 2024-09-13). It has been called a substantial number of times:
 
-```shell
-$ forge test
+```sql
+select count() as c from ethereum.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 20523
+select count() as c from optimism.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 1724
+select count(*) as c from arbitrum.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 48418
+select count(*) as c from avalanche_c.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 4177
+select count(*) as c from polygon.logs where topic0 = keccak(to_utf8('Paused(address)')) -- 34208
 ```
 
-### Format
+However, when a contract is paused, users receive no additional information regarding the reason for the pause or any possible actions they can take. They only encounter a generic Paused error.
 
-```shell
-$ forge fmt
-```
+The proposed enhancement is to extend the pause mechanism to include a string reason, which will provide meaningful information to users. This change will allow users to see a reason for the pause, improving transparency and communication.
 
-### Gas Snapshots
+```diff
+function _pause(string memory reason) internal virtual whenNotPaused {
+     _paused = true;
++    _reason =  reason;
+    emit Paused(_msgSender());
+}
 
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+function _requireNotPaused() internal view virtual {
+    if (paused()) {
++        revert EnforcedPause(_reason);
+-        revert EnforcedPause();
+    }
+}
 ```
