@@ -24,7 +24,8 @@ However, when a contract is paused, users receive no additional information rega
 The proposed enhancement is to extend the pause mechanism to include a string reason, which will provide meaningful information to users. This change will allow users to see a reason for the pause, improving transparency and communication.
 
 ```diff
-function _pause(string memory reason) internal virtual whenNotPaused {
++function _pause(string memory reason) internal virtual whenNotPaused {
+-function _pause() internal virtual whenNotPaused {    
      _paused = true;
 +    _reason =  reason;
     emit Paused(_msgSender());
