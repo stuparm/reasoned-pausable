@@ -80,7 +80,7 @@ abstract contract Pausable is Context {
     }
 
     /**
-     * @dev Throws if the contract is paused.
+     * @dev Throws if the contract is paused.ππ
      */
     function _requireNotPaused() internal view virtual {
         if (paused()) {
